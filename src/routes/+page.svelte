@@ -1,5 +1,6 @@
 <script>
     import  CreateFunction from "./createFunction.svelte";
+    import  ListFunctions  from "./listFunctions.svelte";
     let newFucntion =false
 </script>
 
@@ -8,4 +9,5 @@
     {#if newFucntion}
     <CreateFunction/>
     {/if}
+    <ListFunctions/>
 </main>
