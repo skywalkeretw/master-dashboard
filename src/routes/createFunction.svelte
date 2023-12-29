@@ -1,4 +1,5 @@
 <script>
+    import parseFunction from "../helpers/parseFunction";
     let languages = [
         {"lable": "Python", "value": "python"},
         {"lable": "NodeJS", "value": "nodejs"},
@@ -12,6 +13,8 @@
     let httpasync = false
     let messagingsync = true
     let messagingasync = false
+    let parameters = ""
+    let returnData = ""
 
 
     function handleFileInputChange(event) {
@@ -39,7 +42,30 @@
         }
     };
     
+
+    function parseCode() {
+        let data = parseFunction(code, lang)
+        console.log(data)
+        parameters = (typeof data.params === 'object') ? JSON.stringify(data.params) : data.params;
+        returnData = (typeof data.ret === 'object') ? JSON.stringify(data.ret) : data.ret;
+    }
+
     $: console.log(name, lang)
+    let isLoading = false
+    function createFunction(){
+        isLoading = true
+        fetch("url", {
+
+        })
+        .then(res => {
+            isLoading = false
+
+        })
+        .catch(err => {
+            isLoading = false
+
+        })
+    }
 </script>
 
 <form on:submit|preventDefault={()=> console.log("submit")}>
@@ -54,7 +80,7 @@
     </select>
 
     <label for="functionCode">Function Code</label>
-    <textarea id="functionCode" bind:value={code} ></textarea>
+    <textarea id="functionCode" bind:value={code} on:change={parseCode} ></textarea>
     <input type="file" accept=".txt" on:change={handleFileInputChange} />
 
     <div>
@@ -66,5 +92,10 @@
         <input type="checkbox" bind:checked={messagingasync}>
     </div>
 
+    <lable for="parameters">Input Parameters</lable>
+    <textarea id="parameters" bind:value={parameters}></textarea>
+
+    <label for="returnValue">Return</label>
+    <textarea id="eturnValue" bind:value={returnData}></textarea>
     <button type="submit">Deploy Function</button>
 </form>

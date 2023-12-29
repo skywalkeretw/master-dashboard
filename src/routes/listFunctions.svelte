@@ -1,5 +1,18 @@
 <script>
+    import { onMount } from "svelte";
     import functionsList from "./functions";
+    onMount(()=> {
+        fetch("url")
+        .then(res =>{
+            return res.json()
+        })
+        .then(data => {
+            console.log(data)
+        })
+        .catch(err => {
+
+        })
+    })
 
 </script>
 
