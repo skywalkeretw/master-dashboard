@@ -51,7 +51,9 @@
     }
 
     $: console.log(name, lang)
+
     let isLoading = false
+    
     function createFunction(){
         isLoading = true
         fetch("url", {
