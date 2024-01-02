@@ -1,22 +1,24 @@
-<!-- App.svelte -->
+<!-- ParentComponent.svelte -->
 
 <script>
   import AceEditor from './AceEditor.svelte';
+  let parentContent = "This is content from the parent";
+  let out = ""
+  function handleEditorContentChange(newContent) {
+    console.log("Received update from editor:", newContent.detail);
+    out = newContent.detail;
+  }
 
-  let parentEditorCode = "function bar(items) {\n  var y = 'New code from parent';\n  return y;\n}";
-
-  function handleContentChange(newContent) {
-    console.log("Parent component received content change:", newContent);
-    // Handle the content change as needed in the parent component
+  function updateEditorContent() {
+    // Send new code to the editor
+    parentContent = "New content from the parent";
   }
 </script>
 
-<style>
-  /* Add your styles if needed */
-</style>
+<AceEditor editorContent={parentContent} on:contentChange={handleEditorContentChange} />
 
-<h1>Parent Component</h1>
+<button on:click={updateEditorContent}>Update Editor Content</button>
 
-<AceEditor bind:initialCode={parentEditorCode} on:contentChange={handleContentChange} />
 
-<p>Parent Editor Code: {parentEditorCode}</p>
+<br>
+<textarea value={out}></textarea>

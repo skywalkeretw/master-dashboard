@@ -1,16 +1,16 @@
 <!-- AceEditor.svelte -->
 
 <script>
-  import { onMount, afterUpdate, createEventDispatcher } from 'svelte';
+  import { onMount, createEventDispatcher, afterUpdate } from 'svelte';
+  import { writable } from 'svelte/store';
 
   const dispatch = createEventDispatcher();
   let editor;
 
   // Import writable store for editor content
-  import { writable } from 'svelte/store';
-  export const editorContent = writable("");
 
   export let initialCode = "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
+  export let editorContent = ""; 
 
   onMount(() => {
     editor = ace.edit("editor");
@@ -19,26 +19,21 @@
 
     // Set the initial content of the editor
     editor.setValue(initialCode);
-    editorContent.set(initialCode);
+    dispatch("contentChange", initialCode);
 
     // Listen for changes in the editor and update the store
     editor.getSession().on("change", function () {
       const newContent = editor.getValue();
-      editorContent.set(newContent);
       dispatch("contentChange", newContent);
     });
   });
 
-  afterUpdate(() => {
-    // Update editor content when store changes
-    if ($editorContent !== editor.getValue()) {
-      editor.setValue($editorContent);
-    }
-  });
 
-  function showAlert() {
-    alert("Button clicked!");
+  $: if (editorContent !== null ){
+    console.log(editorContent);
+    // set editor value
   }
+   
 </script>
 
 <style>
@@ -58,14 +53,8 @@
     width: 100%;
     height: 100%;
   }
-
-  button {
-    margin-top: 10px;
-  }
 </style>
 
 <div id="editor-container">
   <div id="editor"></div>
 </div>
-
-<button on:click={showAlert}>Show Alert</button>
