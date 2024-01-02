@@ -87,11 +87,15 @@
 
     <div>
         <h2>HTTP</h2>
-        <input type="checkbox" bind:checked={httpsync}>
-        <input type="checkbox" bind:checked={httpasync}>
+        <label for="httpsync">Sync</label>
+        <input type="checkbox" id="httpsync" bind:checked={httpsync}>
+        <label for="httpasync">Async</label>
+        <input type="checkbox" id="httpasync" bind:checked={httpasync}>
         <h2>Messaging</h2>
-        <input type="checkbox" bind:checked={messagingsync}>
-        <input type="checkbox" bind:checked={messagingasync}>
+        <label for="messagingsync">Sync</label>
+        <input type="checkbox" id="messagingsync" bind:checked={messagingsync}>
+        <label for="messagingasync">Async</label>
+        <input type="checkbox" id="messagingasync" bind:checked={messagingasync}>
     </div>
 
     <lable for="parameters">Input Parameters</lable>
