@@ -1,39 +1,103 @@
 <!-- AceEditor.svelte -->
 
 <script>
-  import { onMount, createEventDispatcher, afterUpdate } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { onMount, createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
   let editor;
 
   // Import writable store for editor content
+  //export let initialCode = "";
+  export let editorContent = "";
+  export let language = "";
+  let mount = false;
+  
+  function setEditor(code){
+    editor.setValue(code);
+    validate();
+    dispatch("contentChange", code);
+  }
 
-  export let initialCode = "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
-  export let editorContent = ""; 
+  function setMode() {
+    console.log(language)
+    editor.session.setMode("ace/mode/" + language);
+  }
+
+  function validate() {
+    editor.session.clearAnnotations();
+    var lines = editor.session.getDocument().getAllLines();
+    let annotations = [];
+    for (var i in lines) {
+        if (!/^[\w\s]*$/.test(lines[i])) {
+            annotations.push({
+                row: i,
+                type: "error",
+                text: "This line contains special symbols!"
+            });
+        }
+        else if (/\d/.test(lines[i])) {
+            annotations.push({
+                row: i,
+                type: "warning",
+                text: "This line contains numbers!"
+            });
+        }
+        else if (/_/.test(lines[i])) {
+            annotations.push({
+                row: i,
+                type: "info",
+                text: "This line contains _!"
+            });
+        }
+
+    }
+    editor.session.setAnnotations(annotations);
+}
 
   onMount(() => {
     editor = ace.edit("editor");
+    ace.require('ace/ext/settings_menu').init(editor);
     editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/javascript");
+    setMode()
+    editor.commands.addCommands([
+        {
+            name: "showSettingsMenu",
+            bindKey: {
+                win: "Ctrl-q",
+                mac: "Ctrl-q"
+            },
+            exec: function (editor) {
+                editor.showSettingsMenu();
+            },
+            readOnly: true
+        }
+    ]);
+    
+    mount = true;
 
     // Set the initial content of the editor
-    editor.setValue(initialCode);
-    dispatch("contentChange", initialCode);
+    setEditor(editorContent)
 
     // Listen for changes in the editor and update the store
     editor.getSession().on("change", function () {
       const newContent = editor.getValue();
       dispatch("contentChange", newContent);
     });
+    editor.on("input", () => {
+        validate();
+    });
   });
 
-
-  $: if (editorContent !== null ){
-    console.log(editorContent);
-    // set editor value
+  // Update the content of the editor
+  $: if (editorContent !== "" && mount) {
+    setEditor(editorContent)
   }
-   
+
+  // change the langauge of the editor
+  $: if (language !== "" && mount) {
+    setMode()
+  }
+
 </script>
 
 <style>
@@ -58,3 +122,4 @@
 <div id="editor-container">
   <div id="editor"></div>
 </div>
+<button on:click={editor.showSettingsMenu()}>Show Settings Menu</button>

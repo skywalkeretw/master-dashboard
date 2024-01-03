@@ -2,8 +2,15 @@
 
 <script>
   import AceEditor from './AceEditor.svelte';
-  let parentContent = "This is content from the parent";
+  let parentContent =  "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
   let out = ""
+  let lang = "python"
+  let languages = [
+        {"lable": "Python", "value": "python"},
+        {"lable": "NodeJS", "value": "javascript"},
+        {"lable": "Golang", "value": "golang"}
+    ]
+
   function handleEditorContentChange(newContent) {
     console.log("Received update from editor:", newContent.detail);
     out = newContent.detail;
@@ -11,14 +18,21 @@
 
   function updateEditorContent() {
     // Send new code to the editor
-    parentContent = "New content from the parent";
+    parentContent = out;
   }
 </script>
 
-<AceEditor editorContent={parentContent} on:contentChange={handleEditorContentChange} />
+<label for="language">language</label>
+<select bind:value={lang}>
+    {#each languages as language}
+    <option value="{language.value}">{language.lable}</option>
+    {/each}
+</select>
+
+<AceEditor language={lang} editorContent={parentContent} on:contentChange={handleEditorContentChange} />
 
 <button on:click={updateEditorContent}>Update Editor Content</button>
 
 
 <br>
-<textarea value={out}></textarea>
+<textarea bind:value={out}></textarea>
