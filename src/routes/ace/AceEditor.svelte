@@ -1,5 +1,5 @@
 <script>
-  import { onMount, createEventDispatcher, onDestroy } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
   let editor;
   let editorContainer;
@@ -71,13 +71,6 @@
   $: if (language !== "" && mount) {
     setMode();
   }
-
-  onDestroy(() => {
-    // Clean up when the component is destroyed
-    // ace.edit(`editor-${editorId}`);
-    //editor.container.destroy();
-    console.log("destroy")
-  });
 </script>
 
 <style>
