@@ -1,9 +1,11 @@
 <script>
+  import { Title } from '@svelteuidev/core';
   import { onMount, createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
   let editor;
   let editorContainer;
 
+  export let label = "";
   export let language = "";
   export let editorId = Math.random().toString(36).substr(2, 9); // Generate a unique ID for each editor
   export let editorContent = "";
@@ -87,8 +89,10 @@
     height: 100%;
   }
 </style>
-
+{#if label}
+  <Title >{label}</Title>  
+{/if}
 <div class="editor-container" bind:this={editorContainer}>
   <div class="editor" id={`editor-${editorId}`}></div>
 </div>
-<button on:click={() => editor.showSettingsMenu()}>Show Settings Menu</button>
+<!-- <button on:click={() => editor.showSettingsMenu()}>Show Settings Menu</button> -->

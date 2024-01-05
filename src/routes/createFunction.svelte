@@ -1,33 +1,40 @@
 <script>
     // imports 
     import parseFunction from "../helpers/parseFunction";
-    import { TextInput, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button } from '@svelteuidev/core';
+    import { TextInput, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload } from '@svelteuidev/core';
     import AceEditor from './ace/AceEditor.svelte'
-
-
+    
+    // Variables used to create the Function
+    // Function Name
+    let name = "";
+    // Programming Language used an options
+    let lang = 'javascript';
     let languages=[
         {label: "Python", value: "python"},
         {label: "NodeJS", value: "javascript"},
         {label: "Golang", value: "golang"}
     ]
-
-    let name = "";
-    let lang = 'javascript';
+    // modes the function should support
+    // let modes = [
+    //     { id: "", label: 'HTTP Sync', value: true },
+    //     { id: "", label: 'HTTP Async', value: false },
+    //     { id: "", label: 'Messaging Sync', value: true },
+    //     { id: "", label: 'Messaging Async ', value: false }
+    // ]
+    let modes = {
+        "httpsync": { label: 'HTTP Sync', value: true },
+        "httpasync": { label: 'HTTP Async', value: false },
+        "messagingsync": { label: 'Messaging Sync', value: true },
+        "messagingasync": { label: 'Messaging Async ', value: false }
+    }
 
     let codeInput = "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
     let code = "";
 
-    let modes = [
-        { id: "", label: 'HTTP Sync', value: true },
-        { id: "", label: 'HTTP Async', value: false },
-        { id: "", label: 'Messaging Sync', value: true },
-        { id: "", label: 'Messaging Async ', value: false }
-    ]
-
-    let parametersInput = ""
+    let parametersInput = "{}"
     let parameters = ""
 
-    let returnDataInput = ""
+    let returnDataInput = "{}"
     let returnData = ""
 
     function handleCodeEditorContentChange(newContent) {
@@ -50,12 +57,13 @@
         }
         const fileInput = event.target
         const file = fileInput.files[0];
+        console.log(file)
 
         if (file && file.type === 'text/plain') {
             const reader = new FileReader();
 
             reader.onload = () => {
-                code = reader.result;
+                codeInput = reader.result;
                 fileInput.value = "";
             };
 
@@ -124,28 +132,33 @@
             />
             <Space h="xl"/>
             <Text>Modes</Text>
-            {#each modes as item, index}
-                <Checkbox bind:checked={modes[index].value} label={item.label} />
+            {#each Object.entries(modes) as [modeId, { label, value }]}
+                <Checkbox bind:checked={modes[modeId].value} label={label} />
             {/each}
         </div>
 
         <div>
             <AceEditor
+                label="Code"
                 language={lang}
                 editorId="code"
                 editorContent={codeInput}
                 on:contentChange={handleCodeEditorContentChange}
             />
-            <input type="file" accept=".txt" on:change={handleFileInputChange} />
+            <!-- <FileUpload accept=".txt" on:change={handleFileInputChange} /> -->
+            <FileUpload  reset={false} preview={false} on:change={handleFileInputChange}/>
+            <!-- <input type="file" accept=".txt" on:change={handleFileInputChange} /> -->
         </div>
         <div>
             <AceEditor
+                label="Parameters"
                 language={"json"}
                 editorId="parameters"
                 editorContent={parametersInput}
                 on:contentChange={handleParametersEditorContentChange}
             />
             <AceEditor
+                label="Return"
                 language={"json"}
                 editorId="return"
                 editorContent={returnDataInput}
@@ -154,5 +167,4 @@
         </div>
     </SimpleGrid>
     <Button type="submit">Create Function</Button>
-    <hr>
 </form>
