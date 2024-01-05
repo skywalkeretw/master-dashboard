@@ -1,8 +1,8 @@
 <script>
     // imports 
-    import parseFunction from "../helpers/parseFunction";
+    import parseFunction from "../../helpers/parseFunction";
     import { TextInput, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload } from '@svelteuidev/core';
-    import AceEditor from './ace/AceEditor.svelte'
+    import AceEditor from '../ace/AceEditor.svelte'
     
     // Variables used to create the Function
     // Function Name

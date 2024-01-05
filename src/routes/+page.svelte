@@ -1,6 +1,6 @@
 <script>
     import { Container } from '@svelteuidev/core';
-    import CreateFunction from './createFunction.svelte'
+    import CreateFunction from './createFunction/createFunction.svelte'
 </script>
 
 

@@ -3,7 +3,16 @@
 	import HeadContent from './headContent.svelte';
 </script>
 
+<style>
+	.content{
+		margin: 0.5rem;
+		padding: 1.5rem;
+	}
+</style>
+
 <SvelteUIProvider withGlobalStyles>
 	<HeadContent/>
-	<slot />
+	<div class="content">
+		<slot />
+	</div>
 </SvelteUIProvider>
