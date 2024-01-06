@@ -1,12 +1,13 @@
 <script>
     // imports 
     import parseFunction from "../../helpers/parseFunction";
-    import { TextInput, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload } from '@svelteuidev/core';
+    import { TextInput, Textarea, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload } from '@svelteuidev/core';
     import AceEditor from '../ace/AceEditor.svelte'
     
     // Variables used to create the Function
     // Function Name
     let name = "";
+    let description = "";
     // Programming Language used an options
     let lang = 'javascript';
     let languages=[
@@ -85,6 +86,7 @@
     function createFunction(){
         let data = {
             name: name,
+            description: description,
             language: lang,
             modes: modes,
             code: code,
@@ -121,6 +123,14 @@
                 bind:value={name}
                 placeholder="Function Name"
                 label="Function Name"
+                size="md"
+            />
+            <Space h="xl"/>
+            <Textarea  
+                placeholder="Function Description"
+                label="Function Description"
+                rows={6}
+                bind:value={description}
                 size="md"
             />
             <Space h="xl"/>
