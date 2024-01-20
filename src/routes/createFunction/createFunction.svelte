@@ -1,7 +1,7 @@
 <script>
     // imports 
     import parseFunction from "../../helpers/parseFunction";
-    import { TextInput, Textarea, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload } from '@svelteuidev/core';
+    import { TextInput, Textarea, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload, Group } from '@svelteuidev/core';
     import AceEditor from '../ace/AceEditor.svelte'
     
     // Variables used to create the Function
@@ -167,6 +167,8 @@
                 editorContent={parametersInput}
                 on:contentChange={handleParametersEditorContentChange}
             />
+            <Button>Update Params</Button>
+            <Space h="md"/> 
             <AceEditor
                 label="Return"
                 language={"json"}
@@ -174,6 +176,7 @@
                 editorContent={returnDataInput}
                 on:contentChange={handleReturnDataEditorContentChange}
             />
+            <Button>Update Return</Button>
         </div>
     </SimpleGrid>
     <Button type="submit">Create Function</Button>

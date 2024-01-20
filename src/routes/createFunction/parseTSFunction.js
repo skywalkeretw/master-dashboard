@@ -7,13 +7,44 @@ export function parseTSCode(code){
     const parameters = match[2];          // "data: string, options: { enabled: boolean }"
     const parametersJSON = parseInputString(parameters);
     const returnType = match[3];           // "{ result: string, status: boolean }"
-    const returnJSON = parseStringToObject2(returnType)
+    const returnJSON = parseReturnString(returnType)
     return {
         name: functionName,
         parameters: parametersJSON,
         return: returnJSON
     }
 }
+
+const typescriptTypes = [
+    'number',
+    'string',
+    'boolean',
+    'number[]',
+    'string[]',
+    'boolean[]',
+    // 'null',
+    // 'undefined',
+    // 'void',
+    // 'object',
+    // '{} (object literal)',
+    // 'Array<T>',
+    // '[T, U, ...rest]',
+    // '(parameter: type) => returnType',
+    // 'enum',
+    // 'type MyType = T1 | T2',
+    // 'type CombinedType = T1 & T2',
+    // 'type MyGeneric<T> = SomeType<T>',
+    // 'type MyConditionalType<T> = T extends U ? X : Y',
+    // 'type MyMappedType<T> = { [K in keyof T]: SomeType }',
+    // 'type MyLiteralType = \'value1\' | \'value2\'',
+    // 'Partial<T>',
+    // 'Readonly<T>',
+    // 'Record<K, T>',
+    // 'Pick<T, K>',
+    // 'Omit<T, K>',
+    // 'ReturnType<T>',
+    // 'Parameters<T>',
+  ];
 
 function parseInputString(inputString) {
     const result = {};
@@ -43,10 +74,19 @@ function isJSONString(str) {
 }
 
 
-function parseStringToObject2(inputString) {
+function parseReturnString(inputString) {
     try {
       // Remove spaces and curly braces from the input string
       const cleanedString = inputString.replace(/\s/g, '').replace(/[{}]/g, '');
+
+      if (cleanedString === ''){
+        return null
+      }
+
+      // If the input is a standalone type, return it directly
+      if (typescriptTypes.includes(cleanedString.toLowerCase())) {
+        return cleanedString;
+      }
   
       // Split the string into key-value pairs
       const pairs = cleanedString.split(',');
@@ -64,8 +104,15 @@ function parseStringToObject2(inputString) {
         // Remove unnecessary quotes from the value
         const cleanValue = value.trim().replace(/^["']|["']$/g, '');
   
-        // Add the key-value pair to the result object
-        resultObject[cleanKey] = cleanValue;
+        // Check if the value is a string and a valid type
+        if (cleanValue === '') {
+          resultObject[cleanKey] = null;
+        // } else if (isNaN(cleanValue) && !validTypes.includes(cleanValue.toLowerCase())) {
+        //   resultObject[cleanKey] = { error: 'Invalid type' };
+        } else {
+          // Add the key-value pair to the result object
+          resultObject[cleanKey] = isNaN(cleanValue) ? cleanValue : null;
+        }
       });
   
       return resultObject;
@@ -75,7 +122,7 @@ function parseStringToObject2(inputString) {
     }
   }
 
-const inputString = "function processData(data: string, x: number): string { /* function body */ }";
+const inputString = "some other code function processData(data: string, x: {}}): {name: string}[] { /* function body */ }";
 
 
 console.log(parseTSCode(inputString))
