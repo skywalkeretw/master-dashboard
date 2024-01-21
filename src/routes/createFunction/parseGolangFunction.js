@@ -1,24 +1,37 @@
 export function parseGoCode(code) {
     // Regular expression for Go function
-    const regex = /func\s+(\w+)\s*\(([^)]*)\)\s*([^)]*)\s*{/;
+    const regex = /func\s+(\w+)\s*\(([^)]*)\)\s*([^)]*)\s*{\s*/;
     const match = code.match(regex);
 
-    if (!match) {
-        return null; // Return null if no match is found
+    let retData = {
+        name: "",
+        parameters: {},
+        return: {}
+      }
+    
+    if (match === null){
+    console.log("Regex failed ")
+    return retData
     }
 
-    const functionName = match[1]; // Function name
-    const parameters = match[2]; // Parameters
-    const returnType = match[3]; // Return type
+    retData.name = match[1];        // "processData"
 
-    return {
-        name: functionName,
-        parameters: parseGoParameters(parameters),
-        return: parseGoReturnType(returnType),
-    };
+    const parameters = match[2];          // "data: string, options: { enabled: boolean }"
+    if (parameters !== undefined) {
+      retData.parameters = parseInputString(parameters);
+  
+    }
+    const returnType = match[3];           // "{ result: string, status: boolean }"
+    console.log(returnType)
+    if (returnType !== undefined) {
+      retData.return = parseReturnString(returnType)
+    }
+  
+    console.log(retData)
+    return retData
 }
 
-function parseGoParameters(parametersString) {
+function parseInputString(parametersString) {
     const result = {};
 
     // Split parametersString into individual parameters
@@ -35,13 +48,47 @@ function parseGoParameters(parametersString) {
     return result;
 }
 
-function parseGoReturnType(returnTypeString) {
-    // You can implement the parsing logic for Go return types here
-    // This may involve handling complex types, arrays, structs, etc.
+function parseReturnString(returnTypeString) {
+    const structRegex = /struct\s*{([^}]*)}/;
+    const structMatch = returnTypeString.match(structRegex);
 
-    // For simplicity, returning the raw returnTypeString in this example
+    if (structMatch) {
+        // If a struct is detected, parse and convert to JSON
+        const structBody = structMatch[1].trim();
+        const properties = structBody.split(/\s*,\s*/);
+
+        const jsonObject = {};
+        properties.forEach(property => {
+            const [key, value] = property.split(/\s*:\s*/);
+            jsonObject[key] = value;
+        });
+
+        return JSON.stringify(jsonObject, null, 2); // Pretty print JSON
+    }
+
+    // Return the original returnTypeString if no struct is detected
     return returnTypeString;
 }
+
+function getGoTypeInformation(typeName, goFileContent) {
+    const typeRegex = new RegExp(`type\\s+${typeName}\\s*struct\\s*{([^}]*)}`);
+    const typeMatch = goFileContent.match(typeRegex);
+  
+    if (typeMatch) {
+      const typeBody = typeMatch[1].trim();
+      const properties = typeBody.split(/\s*;\s*/);
+  
+      const typeInfo = {};
+      properties.forEach(property => {
+        const [propertyName, propertyType] = property.split(/\s*:\s*/);
+        typeInfo[propertyName] = propertyType;
+      });
+  
+      return typeInfo;
+    }
+  
+    return null; // Type not found
+  }
 
 // const goCode = "func processData(data string, x struct{}) []struct{name string} { /* function body */ }";
 

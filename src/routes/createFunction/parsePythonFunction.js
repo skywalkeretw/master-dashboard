@@ -1,22 +1,33 @@
 export function parsePyCode(code) {
-    const regex = /def\s+(\w+)\s*\(([^)]*)\)\s*->\s*(.+)/;
+    const regex = /def\s+(\w+)\s*\(\s*([^)]*)\s*\)\s*->\s*({[^}]+}|[^:]+)?\s*:/;
     const match = code.match(regex);
 
-    if (!match) {
-        throw new Error('Invalid Python function format');
+    let retData = {
+        name: "",
+        parameters: {},
+        return: {}
     }
 
-    const functionName = match[1];
-    const parameters = match[2];
-    const parametersJSON = parseInputString(parameters);
-    const returnType = match[3];
-    const returnJSON = parseReturnString(returnType);
+    if (match === null){
+        console.log("Regex failed ")
+        return retData
+    }
 
-    return {
-        name: functionName,
-        parameters: parametersJSON,
-        return: returnJSON
-    };
+    retData.name = match[1];        // "processData"
+
+    const parameters = match[2];          // "data: string, options: { enabled: boolean }"
+    if (parameters !== undefined) {
+      retData.parameters = parseInputString(parameters);
+  
+    }
+    const returnType = match[3];           // "{ result: string, status: boolean }"
+    console.log(returnType)
+    if (returnType !== undefined) {
+      retData.return = parseReturnString(returnType)
+    }
+  
+    console.log(retData)
+    return retData
 }
 
 function parseInputString(inputString) {
