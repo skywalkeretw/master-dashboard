@@ -1,23 +1,33 @@
 export function parseTSCode(code){
+  const regex = /function\s+(\w+)\s*\(\s*([^)]*)\s*\)\s*(?::\s*({[^}]+}|[^;{]+)\s*)?\s*{/;
+  const match = code.match(regex);
 
-    const regex = /function\s+(\w+)\s*\(([^)]*)\)\s*:\s*({[^}]+}|[^;{]+)\s*{/;
-    const match = code.match(regex);
+  let retData = {
+    name: "",
+    parameters: {},
+    return: {}
+  }
 
-    const functionName = match[1];        // "processData"
-    const parameters = match[2];          // "data: string, options: { enabled: boolean }"
-    console.log("param string: ", parameters)
-    const parametersJSON = parseInputString(parameters);
-    console.log("param data", parametersJSON)
-    const returnType = match[3];           // "{ result: string, status: boolean }"
-    console.log("return string: ", parameters)
-    const returnJSON = parseReturnString(returnType)
-    console.log("return data", returnJSON)
+  if (match === null){
+    console.log("Regex failed ")
+    return retData
+  }
 
-    return {
-        name: functionName,
-        parameters: parametersJSON,
-        return: returnJSON
-    }
+  retData.name = match[1];        // "processData"
+
+  const parameters = match[2];          // "data: string, options: { enabled: boolean }"
+  if (parameters !== undefined) {
+    retData.parameters = parseInputString(parameters);
+
+  }
+  const returnType = match[3];           // "{ result: string, status: boolean }"
+  console.log(returnType)
+  if (returnType !== undefined) {
+    retData.return = parseReturnString(returnType)
+  }
+
+  console.log(retData)
+  return retData
 }
 
 const typescriptTypes = [
