@@ -10,8 +10,7 @@ export function parseGoCode(code) {
       }
     
     if (match === null){
-    console.log("Regex failed ")
-    return retData
+        return retData
     }
 
     retData.name = match[1];        // "processData"
@@ -22,13 +21,10 @@ export function parseGoCode(code) {
   
     }
     const returnType = match[3];
-    console.log("qwerty",getGoTypeInformation(returnType, code))         // "{ result: string, status: boolean }"
-    console.log(returnType)
     if (returnType !== undefined) {
       retData.return = parseReturnString(returnType, code)
     }
   
-    console.log(retData)
     return retData
 }
 
@@ -89,7 +85,6 @@ function parseReturnString(returnTypeString, code) {
   
       // Call getGoTypeInformation for named types
       const typeInformation = getGoTypeInformation(typeName, code);
-      console.log("typeInformation", typeInformation)
       return typeInformation
     //   if (typeInformation) {
     //     // Remove leading and trailing whitespaces from the type values
@@ -147,8 +142,3 @@ function parseReturnString(returnTypeString, code) {
   
     return null; // Type not found
   }
-  
-
-// const goCode = "func processData(data string, x struct{}) []struct{name string} { /* function body */ }";
-
-// console.log(parseGoCode(goCode));
