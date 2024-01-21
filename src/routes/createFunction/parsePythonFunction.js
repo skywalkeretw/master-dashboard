@@ -80,7 +80,3 @@ const pythonTypes = [
     'List[bool]',
     // # Add other Python types as needed
 ];
-
-// const inputString = "def processData(data: str, x: dict) -> List[Dict[str, Any]]: # function body";
-
-// console.log(parsePyCode(inputString));

@@ -34,12 +34,11 @@ function parseInputString(parametersString, code) {
     // Split parametersString into individual parameters
     const parameters = parametersString.split(', ');
 
-    // Process each parameter
     parameters.forEach((param) => {
         const [name, type] = param.split(' ').map((item) => item.trim());
 
         // Check if the type is a supported Go type
-        const supportedTypes = ['int', 'string', 'bool', 'float32', 'float64'];
+        const supportedTypes = ['int', 'string', 'bool', 'float', 'float32', 'float64'];
         if (supportedTypes.includes(type)) {
             result[name] = type;
         } else {
@@ -54,7 +53,6 @@ function parseInputString(parametersString, code) {
 
                 result[name] = customTypeInfo;
             } else {
-                // If not a custom type, add it as is
                 result[name] = type;
             }
         }
@@ -82,40 +80,11 @@ function parseReturnString(returnTypeString, code) {
   
     if (namedTypeMatch) {
       const typeName = namedTypeMatch[1];
-  
-      // Call getGoTypeInformation for named types
       const typeInformation = getGoTypeInformation(typeName, code);
       return typeInformation
-    //   if (typeInformation) {
-    //     // Remove leading and trailing whitespaces from the type values
-    //     // Object.keys(typeInformation).forEach(key => {
-    //     //   typeInformation[key] = typeInformation[key].trim();
-    //     // });
-  
-    //     return JSON.stringify(typeInformation, null, 2); // Pretty print JSON
-    //   }
-    }
-  
-    // If a struct is detected, parse and convert to JSON
-    const structRegex = /struct\s*{([^}]*)}/;
-    const structMatch = returnTypeString.match(structRegex);
-  
-    if (structMatch) {
-      const structBody = structMatch[1].trim();
-      const properties = structBody.split(/\s*,\s*/);
-  
-      const jsonObject = {};
-      properties.forEach(property => {
-        const [key, value] = property.split(/\s*:\s*/);
-        // Remove leading and trailing whitespaces from the struct values
-        jsonObject[key] = value.trim();
-      });
-  
-      return JSON.stringify(jsonObject, null, 2); // Pretty print JSON
-    }
-  
-    // Return the original returnTypeString if no struct or named type is detected
-    return returnTypeString;
+    }  
+
+    return {};
   }
   
   

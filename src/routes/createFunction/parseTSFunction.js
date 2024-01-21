@@ -70,7 +70,6 @@ function parseInputString(inputString) {
     // Process each key-value pair
     keyValuePairs.forEach((pair) => {
         const [key, value] = pair.split(':').map((item) => item.trim());
-        
         // Convert value to a valid JSON format
         result[key] = isJSONString(value) ? JSON.parse(value) : value;
     });
@@ -103,10 +102,7 @@ function parseReturnString(inputString) {
         return cleanedString;
       }
   
-      // Split the string into key-value pairs
       const pairs = cleanedString.split(',');
-  
-      // Initialize an empty object to store the key-value pairs
       const resultObject = {};
   
       // Iterate through each pair and extract key and value
@@ -122,10 +118,7 @@ function parseReturnString(inputString) {
         // Check if the value is a string and a valid type
         if (cleanValue === '') {
           resultObject[cleanKey] = "empty";
-        // } else if (isNaN(cleanValue) && !validTypes.includes(cleanValue.toLowerCase())) {
-        //   resultObject[cleanKey] = { error: 'Invalid type' };
         } else {
-          // Add the key-value pair to the result object
           resultObject[cleanKey] = isNaN(cleanValue) ? cleanValue : "empty";
         }
       });
@@ -136,8 +129,3 @@ function parseReturnString(inputString) {
       return "empty"; // Return null in case of an error
     }
   }
-
-// const inputString = "some other code function processData(data: string, x: {}}): {name: string}[] { /* function body */ }";
-
-
-// console.log(parseTSCode(inputString))
