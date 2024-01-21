@@ -18,7 +18,7 @@ export function parseGoCode(code) {
 
     const parameters = match[2];          // "data: string, options: { enabled: boolean }"
     if (parameters !== undefined) {
-      retData.parameters = parseInputString(parameters);
+      retData.parameters = parseInputString(parameters, code);
   
     }
     const returnType = match[3];
@@ -32,7 +32,7 @@ export function parseGoCode(code) {
     return retData
 }
 
-function parseInputString(parametersString) {
+function parseInputString(parametersString, code) {
     const result = {};
 
     // Split parametersString into individual parameters
@@ -42,12 +42,31 @@ function parseInputString(parametersString) {
     parameters.forEach((param) => {
         const [name, type] = param.split(' ').map((item) => item.trim());
 
-        // Add the parameter to the result object
-        result[name] = type;
+        // Check if the type is a supported Go type
+        const supportedTypes = ['int', 'string', 'bool', 'float32', 'float64'];
+        if (supportedTypes.includes(type)) {
+            result[name] = type;
+        } else {
+            // If not a supported type, check if it is a custom type
+            const customTypeInfo = getGoTypeInformation(type, code);
+
+            if (customTypeInfo) {
+                // Remove leading and trailing whitespaces from the type values
+                Object.keys(customTypeInfo).forEach(key => {
+                    customTypeInfo[key] = customTypeInfo[key].trim();
+                });
+
+                result[name] = customTypeInfo;
+            } else {
+                // If not a custom type, add it as is
+                result[name] = type;
+            }
+        }
     });
 
     return result;
 }
+
 
 function parseReturnString(returnTypeString, code) {
     // Supported Go types
