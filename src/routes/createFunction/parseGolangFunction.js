@@ -43,6 +43,6 @@ function parseGoReturnType(returnTypeString) {
     return returnTypeString;
 }
 
-const goCode = "func processData(data string, x struct{}) []struct{name string} { /* function body */ }";
+// const goCode = "func processData(data string, x struct{}) []struct{name string} { /* function body */ }";
 
-console.log(parseGoCode(goCode));
+// console.log(parseGoCode(goCode));

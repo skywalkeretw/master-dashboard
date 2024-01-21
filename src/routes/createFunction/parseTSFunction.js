@@ -5,9 +5,14 @@ export function parseTSCode(code){
 
     const functionName = match[1];        // "processData"
     const parameters = match[2];          // "data: string, options: { enabled: boolean }"
+    console.log("param string: ", parameters)
     const parametersJSON = parseInputString(parameters);
+    console.log("param data", parametersJSON)
     const returnType = match[3];           // "{ result: string, status: boolean }"
+    console.log("return string: ", parameters)
     const returnJSON = parseReturnString(returnType)
+    console.log("return data", returnJSON)
+
     return {
         name: functionName,
         parameters: parametersJSON,
@@ -80,7 +85,7 @@ function parseReturnString(inputString) {
       const cleanedString = inputString.replace(/\s/g, '').replace(/[{}]/g, '');
 
       if (cleanedString === ''){
-        return null
+        return "empty"
       }
 
       // If the input is a standalone type, return it directly
@@ -106,23 +111,23 @@ function parseReturnString(inputString) {
   
         // Check if the value is a string and a valid type
         if (cleanValue === '') {
-          resultObject[cleanKey] = null;
+          resultObject[cleanKey] = "empty";
         // } else if (isNaN(cleanValue) && !validTypes.includes(cleanValue.toLowerCase())) {
         //   resultObject[cleanKey] = { error: 'Invalid type' };
         } else {
           // Add the key-value pair to the result object
-          resultObject[cleanKey] = isNaN(cleanValue) ? cleanValue : null;
+          resultObject[cleanKey] = isNaN(cleanValue) ? cleanValue : "empty";
         }
       });
   
       return resultObject;
     } catch (error) {
       console.error('Error parsing string to object:', error);
-      return null; // Return null in case of an error
+      return "empty"; // Return null in case of an error
     }
   }
 
-const inputString = "some other code function processData(data: string, x: {}}): {name: string}[] { /* function body */ }";
+// const inputString = "some other code function processData(data: string, x: {}}): {name: string}[] { /* function body */ }";
 
 
-console.log(parseTSCode(inputString))
+// console.log(parseTSCode(inputString))

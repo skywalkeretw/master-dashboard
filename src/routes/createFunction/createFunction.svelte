@@ -3,6 +3,9 @@
     import parseFunction from "../../helpers/parseFunction";
     import { TextInput, Textarea, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload, Group } from '@svelteuidev/core';
     import AceEditor from '../ace/AceEditor.svelte'
+    import {parseTSCode} from './parseTSFunction.js'
+    import {parseGoCode} from './parseGolangFunction.js'
+    import {parsePyCode} from './parsePythonFunction.js'
     
     // Variables used to create the Function
     // Function Name
@@ -75,15 +78,40 @@
         }
     };
     
+    function parseCode(){
+        let parsedData = {}
+        console.log("parseCode:", lang)
+        switch (lang) {
+            case 'python':
+                parsedData = parsePyCode(code)
+            break;
+            case 'golang':
+                parsedData = parseGoCode(code)
+            break;
+            case 'javascript':
+                parsedData = parseTSCode(code)
+            break;
+        }
+        return parsedData
+    }
 
-    function parseCode() {
-        let data = parseFunction(code, lang)
-        console.log(data)
-        parameters = (typeof data.params === 'object') ? JSON.stringify(data.params) : data.params;
-        returnData = (typeof data.ret === 'object') ? JSON.stringify(data.ret) : data.ret;
+    function parseName(event) {
+        event.preventDefault();
+        name = parseCode().name
+    }
+
+    function parseParameters(event) {
+        event.preventDefault();
+        parametersInput = JSON.stringify(parseCode().parameters) 
+    }
+
+    function parseReturn(event) {
+        event.preventDefault();
+        returnDataInput = JSON.stringify(parseCode().return)
     }
     
     function createFunction(){
+        console.log("submit")
         let data = {
             name: name,
             description: description,
@@ -125,6 +153,7 @@
                 label="Function Name"
                 size="md"
             />
+            <Button on:click={parseName}>Get Name</Button>
             <Space h="xl"/>
             <Textarea  
                 placeholder="Function Description"
@@ -167,7 +196,7 @@
                 editorContent={parametersInput}
                 on:contentChange={handleParametersEditorContentChange}
             />
-            <Button>Update Params</Button>
+            <Button on:click={parseParameters}>Update Params</Button>
             <Space h="md"/> 
             <AceEditor
                 label="Return"
@@ -176,7 +205,7 @@
                 editorContent={returnDataInput}
                 on:contentChange={handleReturnDataEditorContentChange}
             />
-            <Button>Update Return</Button>
+            <Button on:click={parseReturn}>Update Return</Button>
         </div>
     </SimpleGrid>
     <Button type="submit">Create Function</Button>

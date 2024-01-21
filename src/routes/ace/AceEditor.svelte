@@ -18,7 +18,13 @@
   }
 
   function setMode() {
-    editor.session.setMode("ace/mode/" + language);
+
+    let newLanguage = language
+
+    if (language === 'javascript') {
+      newLanguage = 'typescript'
+    }
+    editor.session.setMode("ace/mode/" + newLanguage);
   }
 
   function validate() {
