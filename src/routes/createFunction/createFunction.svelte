@@ -1,23 +1,35 @@
 <script>
-    // imports 
+    // imports
     import parseFunction from "../../helpers/parseFunction";
-    import { TextInput, Textarea, NativeSelect, SimpleGrid, Text, Space, Checkbox, Button, FileUpload, Group } from '@svelteuidev/core';
-    import AceEditor from '../ace/AceEditor.svelte'
-    import {parseTSCode} from './parseTSFunction.js'
-    import {parseGoCode} from './parseGolangFunction.js'
-    import {parsePyCode} from './parsePythonFunction.js'
-    
+    import {
+        TextInput,
+        Textarea,
+        NativeSelect,
+        SimpleGrid,
+        Text,
+        Space,
+        Checkbox,
+        Button,
+        FileUpload,
+        Group,
+    } from "@svelteuidev/core";
+    import AceEditor from "../ace/AceEditor.svelte";
+    import { parseTSCode } from "./parseTSFunction.js";
+    import { parseGoCode } from "./parseGolangFunction.js";
+    import { parsePyCode } from "./parsePythonFunction.js";
+    import axios from "axios";
+
     // Variables used to create the Function
     // Function Name
     let name = "";
     let description = "";
     // Programming Language used an options
-    let lang = 'javascript';
-    let languages=[
-        {label: "Python", value: "python"},
-        {label: "NodeJS", value: "javascript"},
-        {label: "Golang", value: "golang"}
-    ]
+    let lang = "javascript";
+    let languages = [
+        { label: "Python", value: "python" },
+        { label: "NodeJS", value: "javascript" },
+        { label: "Golang", value: "golang" },
+    ];
     // modes the function should support
     // let modes = [
     //     { id: "", label: 'HTTP Sync', value: true },
@@ -26,20 +38,21 @@
     //     { id: "", label: 'Messaging Async ', value: false }
     // ]
     let modes = {
-        "httpsync": { label: 'HTTP Sync', value: true },
-        "httpasync": { label: 'HTTP Async', value: false },
-        "messagingsync": { label: 'Messaging Sync', value: true },
-        "messagingasync": { label: 'Messaging Async ', value: false }
-    }
+        httpsync: { label: "HTTP Sync", value: true },
+        httpasync: { label: "HTTP Async", value: false },
+        messagingsync: { label: "Messaging Sync", value: true },
+        messagingasync: { label: "Messaging Async ", value: false },
+    };
 
-    let codeInput = "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
+    let codeInput =
+        "function foo(items) {\n  var x = 'All this is syntax highlighted';\n  return x;\n}";
     let code = "";
 
-    let parametersInput = "{}"
-    let parameters = ""
+    let parametersInput = "{}";
+    let parameters = "";
 
-    let returnDataInput = "{}"
-    let returnData = ""
+    let returnDataInput = "{}";
+    let returnData = "";
 
     function handleCodeEditorContentChange(newContent) {
         code = newContent.detail;
@@ -55,15 +68,15 @@
 
     function handleFileInputChange(event) {
         if (code !== "") {
-            if (!confirm("Overwrite current code, params and return?")){
-                return
+            if (!confirm("Overwrite current code, params and return?")) {
+                return;
             }
         }
-        const fileInput = event.target
+        const fileInput = event.target;
         const file = fileInput.files[0];
-        console.log(file)
+        console.log(file);
 
-        if (file && file.type === 'text/plain') {
+        if (file && file.type === "text/plain") {
             const reader = new FileReader();
 
             reader.onload = () => {
@@ -73,80 +86,83 @@
 
             reader.readAsText(file);
         } else {
-            alert('Please select a valid text file (.txt)');
+            alert("Please select a valid text file (.txt)");
             fileInput.value = "";
         }
-    };
-    
-    function parseCode(){
-        let parsedData = {}
-        console.log("parseCode:", lang)
+    }
+
+    function parseCode() {
+        let parsedData = {};
+        console.log("parseCode:", lang);
         switch (lang) {
-            case 'python':
-                parsedData = parsePyCode(code)
-            break;
-            case 'golang':
-                parsedData = parseGoCode(code)
-            break;
-            case 'javascript':
-                parsedData = parseTSCode(code)
-            break;
+            case "python":
+                parsedData = parsePyCode(code);
+                break;
+            case "golang":
+                parsedData = parseGoCode(code);
+                break;
+            case "javascript":
+                parsedData = parseTSCode(code);
+                break;
         }
-        return parsedData
+        return parsedData;
     }
 
     function parseName(event) {
         event.preventDefault();
-        name = parseCode().name
+        name = parseCode().name;
     }
 
     function parseParameters(event) {
         event.preventDefault();
-        parametersInput = JSON.stringify(parseCode().parameters) 
+        parametersInput = JSON.stringify(parseCode().parameters);
     }
 
     function parseReturn(event) {
         event.preventDefault();
-        returnDataInput = JSON.stringify(parseCode().return)
+        returnDataInput = JSON.stringify(parseCode().return);
     }
-    
-    function createFunction(){
-        console.log("submit")
+
+    function createFunction() {
+        console.log("submit");
+
         let data = {
             name: name,
             description: description,
             language: lang,
-            modes: modes,
-            code: code,
-            parameters: parameters,
-            returnData: returnData
-        }
-        console.log(data)
-        // fetch("url", {
+            sourcecode: code,
+            inputparameters: parameters,
+            returnvalue: returnData,
+            functionmodes: {
+                httpsync: modes.httpsync.value,
+                httpasync: modes.httpasync.value,
+                messagingsync: modes.messagingsync.value,
+                messagingasync: modes.messagingasync.value
+            },
+        };
+        console.log(data);
 
-        // })
-        // .then(res => {
-        //     isLoading = false
-
-        // })
-        // .catch(err => {
-        //     isLoading = false
-
-        // })
+        axios.post("http://localhost:8081/api/v1/createfunction", data)
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 </script>
 
 <form on:submit|preventDefault={createFunction}>
     <SimpleGrid
         breakpoints={[
-            { maxWidth: 980, cols: 3, spacing: 'md' },
-            { maxWidth: 755, cols: 2, spacing: 'sm' },
-            { maxWidth: 600, cols: 1, spacing: 'sm' }
+            { maxWidth: 980, cols: 3, spacing: "md" },
+            { maxWidth: 755, cols: 2, spacing: "sm" },
+            { maxWidth: 600, cols: 1, spacing: "sm" },
         ]}
         cols={3}
         spacing="xl"
     >
-        <div>    
+        <div>
             <TextInput
                 bind:value={name}
                 placeholder="Function Name"
@@ -154,25 +170,25 @@
                 size="md"
             />
             <Button on:click={parseName}>Get Name</Button>
-            <Space h="xl"/>
-            <Textarea  
+            <Space h="xl" />
+            <Textarea
                 placeholder="Function Description"
                 label="Function Description"
                 rows={6}
                 bind:value={description}
                 size="md"
             />
-            <Space h="xl"/>
+            <Space h="xl" />
             <NativeSelect
                 data={languages}
                 bind:value={lang}
                 label="Language"
                 description="Select The Programming language you want to use"
             />
-            <Space h="xl"/>
+            <Space h="xl" />
             <Text>Modes</Text>
             {#each Object.entries(modes) as [modeId, { label, value }]}
-                <Checkbox bind:checked={modes[modeId].value} label={label} />
+                <Checkbox bind:checked={modes[modeId].value} {label} />
             {/each}
         </div>
 
@@ -185,7 +201,11 @@
                 on:contentChange={handleCodeEditorContentChange}
             />
             <!-- <FileUpload accept=".txt" on:change={handleFileInputChange} /> -->
-            <FileUpload  reset={false} preview={false} on:change={handleFileInputChange}/>
+            <FileUpload
+                reset={false}
+                preview={false}
+                on:change={handleFileInputChange}
+            />
             <!-- <input type="file" accept=".txt" on:change={handleFileInputChange} /> -->
         </div>
         <div>
@@ -197,7 +217,7 @@
                 on:contentChange={handleParametersEditorContentChange}
             />
             <Button on:click={parseParameters}>Update Params</Button>
-            <Space h="md"/> 
+            <Space h="md" />
             <AceEditor
                 label="Return"
                 language={"json"}
