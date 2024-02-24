@@ -8,7 +8,7 @@ export function parsePyCode(code) {
         return: {}
     }
 
-    if (match === null){
+    if (match === null) {
         console.log("Regex failed ")
         return retData
     }
@@ -17,15 +17,15 @@ export function parsePyCode(code) {
 
     const parameters = match[2];          // "data: string, options: { enabled: boolean }"
     if (parameters !== undefined) {
-      retData.parameters = parseInputString(parameters);
-  
+        retData.parameters = parseInputString(parameters);
+
     }
     const returnType = match[3];           // "{ result: string, status: boolean }"
     console.log(returnType)
     if (returnType !== undefined) {
-      retData.return = parseReturnString(returnType)
+        retData.return = pythonToOpenAPI(parseReturnString(returnType))
     }
-  
+
     console.log(retData)
     return retData
 }
@@ -41,7 +41,7 @@ function parseInputString(inputString) {
         const [name, type] = parameter.split(':').map((item) => item.trim());
 
         // Convert Python type to a valid JSON format
-        result[name] = parsePythonType(type);
+        result[name] = pythonToOpenAPI(parsePythonType(type));
     });
 
     return result;
@@ -80,3 +80,18 @@ const pythonTypes = [
     'List[bool]',
     // # Add other Python types as needed
 ];
+
+function pythonToOpenAPI(pythonType) {
+    const typeMap = {
+        'str': 'string',
+        'int': 'integer',
+        'float': 'number',
+        'bool': 'boolean',
+        'list': 'array',
+        'dict': 'object'
+        // Add more mappings as needed
+    };
+
+    // Convert Python type to OpenAPI type
+    return typeMap[pythonType] || 'string'; // Default to 'string' if not found
+}

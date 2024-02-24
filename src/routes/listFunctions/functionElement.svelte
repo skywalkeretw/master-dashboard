@@ -11,6 +11,8 @@
         Space,
         NativeSelect,
     } from "@svelteuidev/core";
+    import axios from "axios";
+
     export let editorId = Math.random().toString(36).substr(2, 9); // Generate a unique ID for each editor
 
     export let fn = {};
@@ -33,7 +35,7 @@
         return color;
     }
 
-    let selectedMode;
+    let selectedMode = "";
     // supported modes
     let modes = [];
 
@@ -50,7 +52,7 @@
             }
         }
     }
-    onMount(()=> {
+    onMount(() => {
         modes = [];
         for (const mode in fn.modes) {
             if (fn.modes.hasOwnProperty(mode)) {
@@ -71,13 +73,16 @@
                         label = "Messaging Async";
                         break;
                 }
+                if (selectedMode === "" && value) {
+                    selectedMode = mode;
+                }
                 modes = [
                     ...modes,
-                    { label: label, value: mode, disabled: !value},
+                    { label: label, value: mode, disabled: !value },
                 ];
             }
         }
-    })
+    });
     // Watch for changes to myObject and run onDataReceived function
     afterUpdate(() => {
         onDataReceived();
@@ -90,6 +95,47 @@
         { label: "NodeJS", value: "javascript" },
         { label: "Golang", value: "golang" },
     ];
+
+    function downloadAdapterCode() {
+        console.log(
+            "language ",
+            lang,
+            "function: ",
+            fn.name,
+            "mode ",
+            selectedMode,
+        );
+
+        axios
+            .post("http://localhost:8081/api/v1/generateadaptercode", {
+                function: fn.name,
+                mode: selectedMode,
+                language: lang,
+            })
+            .then(function (response) {
+                if (response.headers["content-type"] === "application/zip") {
+                    // Create a temporary <a> element to download the zip file
+                    const url = window.URL.createObjectURL(
+                        new Blob([response.data]),
+                    );
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "adapter_code.zip");
+                    document.body.appendChild(link);
+                    link.click();
+                    link.parentNode.removeChild(link);
+
+                    // Clean up
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    // Handle other types of responses here
+                    console.log("Response is not a zip file");
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 </script>
 
 <Accordion.Item value="control-{editorId}">
@@ -124,6 +170,8 @@
             label="Mode"
             description="Select The Mode you want to use"
         />
-        <Button variant="light" color="blue">Download Adapter Code</Button>
+        <Button on:click={downloadAdapterCode} variant="light" color="blue"
+            >Download Adapter Code</Button
+        >
     </Group>
 </Accordion.Item>

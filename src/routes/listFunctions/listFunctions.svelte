@@ -12,7 +12,6 @@
         getFunctions()
     })
     function getFunctions() {
-        console.log("get function data")
         axios.get("http://localhost:8081/api/v1/function")
             .then(response => {
                 functions = response.data
