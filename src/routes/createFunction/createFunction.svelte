@@ -125,14 +125,13 @@
 
     function createFunction() {
         console.log("submit");
-
         let data = {
             name: name,
             description: description,
             language: lang,
-            sourcecode: code,
-            inputparameters: parameters,
-            returnvalue: returnData,
+            sourcecode: btoa(code),
+            inputparameters: btoa(parameters),
+            returnvalue: btoa(returnData),
             functionmodes: {
                 httpsync: modes.httpsync.value,
                 httpasync: modes.httpasync.value,
