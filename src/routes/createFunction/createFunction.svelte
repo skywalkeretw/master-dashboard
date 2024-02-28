@@ -111,6 +111,9 @@
     function parseName(event) {
         event.preventDefault();
         name = parseCode().name;
+        if (/[A-Z]/.test(name)) {
+            alert("Function Name may not include  uppercase letters.");
+        }
     }
 
     function parseParameters(event) {
@@ -125,29 +128,34 @@
 
     function createFunction() {
         console.log("submit");
-        let data = {
-            name: name,
-            description: description,
-            language: lang,
-            sourcecode: btoa(code),
-            inputparameters: btoa(parameters),
-            returnvalue: btoa(returnData),
-            functionmodes: {
-                httpsync: modes.httpsync.value,
-                httpasync: modes.httpasync.value,
-                messagingsync: modes.messagingsync.value,
-                messagingasync: modes.messagingasync.value
-            },
-        };
-        console.log(data);
+        if (/[A-Z]/.test(name)) {
+            alert("Function Name may not include  uppercase letters.");
+        } else {
+            let data = {
+                name: name,
+                description: description,
+                language: lang,
+                sourcecode: btoa(code),
+                inputparameters: btoa(parameters),
+                returnvalue: btoa(returnData),
+                functionmodes: {
+                    httpsync: modes.httpsync.value,
+                    httpasync: modes.httpasync.value,
+                    messagingsync: modes.messagingsync.value,
+                    messagingasync: modes.messagingasync.value,
+                },
+            };
+            console.log(data);
 
-        axios.post("http://localhost:8081/api/v1/createfunction", data)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+            axios
+                .post("http://localhost:8081/api/v1/createfunction", data)
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
 </script>
 

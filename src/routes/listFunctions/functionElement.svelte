@@ -107,30 +107,36 @@
         );
 
         axios
-            .post("http://localhost:8081/api/v1/generateadaptercode", {
-                function: fn.name,
-                mode: selectedMode,
-                language: lang,
-            })
+            .post(
+                "http://localhost:8081/api/v1/generateadaptercode",
+                {
+                    function: fn.name,
+                    mode: selectedMode,
+                    language: lang,
+                },
+                {
+                    responseType: "blob", // Set the responseType to blob to receive the file as binary data
+                },
+            )
             .then(function (response) {
-                if (response.headers["content-type"] === "application/zip") {
-                    // Create a temporary <a> element to download the zip file
-                    const url = window.URL.createObjectURL(
-                        new Blob([response.data]),
-                    );
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute("download", "adapter_code.zip");
-                    document.body.appendChild(link);
-                    link.click();
-                    link.parentNode.removeChild(link);
+                // Get filename from response headers
+                console.log(response)
+                console.log(response.headers)
+                console.log(response.data)
+                const contentDisposition = response.headers["content-disposition"];
+                const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+                const fileName = fileNameMatch ? fileNameMatch[1] : "downloaded-file";
 
-                    // Clean up
-                    window.URL.revokeObjectURL(url);
-                } else {
-                    // Handle other types of responses here
-                    console.log("Response is not a zip file");
-                }
+                // Create a new Blob object from the response data
+                const file = new Blob([response.data], {
+                    type: response.headers["content-type"],
+                });
+
+                // Create a temporary link element
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(file);
+                link.download = fileName; // Set the filename obtained from the response
+                link.click(); // Trigger the download
             })
             .catch(function (error) {
                 console.log(error);
